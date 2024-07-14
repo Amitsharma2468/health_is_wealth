@@ -5,6 +5,10 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const path = require('path');
 const fs = require('fs');
+const multer = require('multer');
+require('dotenv').config();
+
+const SSLCommerzPayment = require("sslcommerz-lts");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -13,7 +17,7 @@ const port = process.env.PORT || 5000;
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: process.env.MYSQL_PASSWORD || '', // Use environment variable for password
+  password: process.env.MYSQL_PASSWORD || '',
   database: 'lifecycle'
 });
 
@@ -21,7 +25,7 @@ const db = mysql.createConnection({
 db.connect((err) => {
   if (err) {
     console.error('Error connecting to MySQL:', err);
-    process.exit(1); // Exit process with error code
+    process.exit(1);
   }
   console.log('Connected to MySQL database');
 });
@@ -30,15 +34,113 @@ db.connect((err) => {
 app.use(bodyParser.json());
 app.use(cors());
 
-// Serve static files from the "uploads" directory
-app.use('/uploads', express.static('uploads'));
-
 // Ensure uploads directory exists
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
+// Serve static files from the "uploads" directory
+app.use('/uploads', express.static(uploadDir));
+
+// Configure Multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    if (!uploadDir) {
+      return cb(new Error('Upload directory is not defined'));
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, `${uniqueSuffix}-${file.originalname}`);
+  }
+});
+
+const upload = multer({ storage });
+
+// SSLCommerz Configuration
+const sslcommerzDb = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  password: process.env.MYSQL_PASSWORD || '',
+  database: 'lifecycle'
+}).promise();
+
+const store_id = process.env.NEXT_PUBLIC_SSL_STORE_ID;
+const store_passwd = process.env.NEXT_PUBLIC_SSL_STORE_PASSWORD;
+const is_live = false;
+
+app.get("/sslcommerz", (req, res) => {
+  res.send({ store_id, store_passwd });
+});
+
+app.post("/sslcommerz/init", async (req, res) => {
+  const { name, age, bloodGroup, amount, currency } = req.body;
+  const tran_id = `TRANS_${Date.now()}`;
+  const data = {
+    store_id,
+    store_passwd,
+    total_amount: amount,
+    cus_name: name,
+    cus_age: age,
+    cus_bloodGroup: bloodGroup,
+    cus_email: "customer@example.com",
+    cus_phone: "01711111111",
+    shipping_method: "NO",
+    product_name: "Registration",
+    product_category: "N/A",
+    product_profile: "Ticket",
+    currency,
+    tran_id,
+    success_url: `http://localhost:${port}/sslcommerz/success/${tran_id}`,
+    fail_url: `http://localhost:${port}/sslcommerz/fail`,
+    cancel_url: `http://localhost:${port}/sslcommerz/fail`,
+    emi_option: 0,
+  };
+
+  try {
+    const query = `INSERT INTO bills (transaction_id, name, age, blood_group, status, amount, currency) VALUES (?, ?, ?, ?, 'pending', ?, ?)`;
+    await sslcommerzDb.execute(query, [data.tran_id, name, age, bloodGroup, data.total_amount, currency]);
+    const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live);
+    sslcz.init(data).then((apiResponse) => {
+      let GatewayPageURL = apiResponse.GatewayPageURL;
+      res.send({ url: GatewayPageURL });
+      console.log("Redirecting to: ", GatewayPageURL);
+    });
+  } catch (error) {
+    console.log(error);
+    res.send(error);
+  }
+});
+
+app.post("/sslcommerz/success/:tran_id", async (req, res) => {
+  const { tran_id } = req.params;
+
+  try {
+    // Update the bill status to 'paid' in the database
+    const updateQuery = `UPDATE bills SET status = 'paid' WHERE transaction_id = ?`;
+    const [result] = await sslcommerzDb.execute(updateQuery, [tran_id]);
+
+    if (result.affectedRows > 0) {
+      console.log(`Transaction ${tran_id} updated successfully.`);
+      // Redirect to the success page or send any other response
+      res.redirect(`http://localhost:5173/success?invoice=${tran_id}`);
+    } else {
+      console.log(`Transaction ${tran_id} not found.`);
+      res.status(404).send('Transaction not found');
+    }
+  } catch (error) {
+    console.error('Error updating transaction status:', error);
+    res.status(500).send('Error updating transaction status');
+  }
+});
+
+app.post("/sslcommerz/fail", (req, res) => {
+  res.redirect("http://localhost:5173/fail");
+});
+
+// Other Routes
 // Signup endpoint
 app.post('/api/signup', async (req, res) => {
   const { fullName, username, email, password } = req.body;
@@ -90,19 +192,17 @@ app.post('/api/login', (req, res) => {
 });
 
 // Update profile endpoint
-app.post('/api/profile/:username', async (req, res) => {
-  const { habits, age, bloodGroup, birthdate } = req.body;
+app.post('/api/profile/:username', upload.single('profilePicture'), (req, res) => {
+  const { habits, age, bloodGroup, birthdate, profilePictureUrl } = req.body;
   const { username } = req.params;
 
-  const sqlUpdate = `
-    UPDATE signupdb 
-    SET habits = ?, age = ?, bloodGroup = ?, birthdate = ? 
-    WHERE username = ?
-  `;
+  const sqlUpdate = 
+    `UPDATE signupdb 
+    SET habits = ?, age = ?, bloodGroup = ?, birthdate = STR_TO_DATE(?, '%Y-%m-%d'), profilePicture = ?
+    WHERE username = ?`
+  ;
 
-  console.log("Hitted with",username);
-
-  db.query(sqlUpdate, [habits, age, bloodGroup, birthdate, username], (err, result) => {
+  db.query(sqlUpdate, [habits, age, bloodGroup, birthdate, profilePictureUrl, username], (err, result) => {
     if (err) {
       console.error('Error executing MySQL query:', err.sqlMessage);
       return res.status(500).json({ error: 'Internal server error' });
@@ -116,7 +216,7 @@ app.post('/api/profile/:username', async (req, res) => {
 // Fetch profile information endpoint
 app.get('/api/profile/:username', (req, res) => {
   const { username } = req.params;
-  const sqlFetch = 'SELECT habits, age, bloodGroup, birthdate FROM signupdb WHERE username = ?';
+  const sqlFetch = 'SELECT habits, age, bloodGroup, DATE_FORMAT(birthdate, "%Y-%m-%d") AS birthdate, profilePicture FROM signupdb WHERE username = ?';
 
   db.query(sqlFetch, [username], (err, results) => {
     if (err) {
@@ -129,10 +229,42 @@ app.get('/api/profile/:username', (req, res) => {
     }
 
     const profile = results[0];
+    if (profile.profilePicture) {
+      profile.profilePictureUrl = profile.profilePicture;
+    }
     return res.status(200).json({ profile });
   });
 });
 
+// Fetch doctor list endpoint
+app.get('/api/doctors', (req, res) => {
+  const sqlFetchDoctors = 'SELECT name, degree, hospital, address, phonenum, link FROM doctorlist';
+
+  db.query(sqlFetchDoctors, (err, results) => {
+    if (err) {
+      console.error('Error fetching doctor list:', err.sqlMessage);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+
+    return res.status(200).json({ doctors: results });
+  });
+});
+
+// Fetch medicine list endpoint
+app.get('/api/medicines', (req, res) => {
+  const sqlFetchMedicines = 'SELECT name, generic, drugclass, uses, sideeffects, precautions, interactions, image FROM medicine_list';
+
+  db.query(sqlFetchMedicines, (err, results) => {
+    if (err) {
+      console.error('Error fetching medicine list:', err.sqlMessage);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+
+    return res.status(200).json({ medicines: results });
+  });
+});
+
+// Start server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
