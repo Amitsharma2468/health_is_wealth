@@ -126,30 +126,30 @@ function Profiles() {
         <form onSubmit={handleFormSubmit}>
           <div className="mb-4">
             <label htmlFor="habits" className="block text-sm font-medium text-gray-700">Habits</label>
-            <input type="text" id="habits" name="habits" value={profileData.habits} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-green-500 focus:border-green-500 sm:text-sm" />
+            <input type="text" id="habits" name="habits" value={profileData.habits} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-gray-500 focus:border-gray-500 sm:text-sm" />
           </div>
           <div className="mb-4">
             <label htmlFor="age" className="block text-sm font-medium text-gray-700">Age</label>
-            <input type="number" id="age" name="age" value={profileData.age} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-green-500 focus:border-green-500 sm:text-sm" />
+            <input type="number" id="age" name="age" value={profileData.age} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-gray-500 focus:border-grayn-500 sm:text-sm" />
           </div>
           <div className="mb-4">
             <label htmlFor="bloodGroup" className="block text-sm font-medium text-gray-700">Blood Group</label>
-            <input type="text" id="bloodGroup" name="bloodGroup" value={profileData.bloodGroup} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-green-500 focus:border-green-500 sm:text-sm" />
+            <input type="text" id="bloodGroup" name="bloodGroup" value={profileData.bloodGroup} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-gray-500 focus:border-gray-500 sm:text-sm" />
           </div>
           <div className="mb-4">
             <label htmlFor="birthdate" className="block text-sm font-medium text-gray-700">Birthdate</label>
-            <input type="date" id="birthdate" name="birthdate" value={profileData.birthdate} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-green-500 focus:border-green-500 sm:text-sm" />
+            <input type="date" id="birthdate" name="birthdate" value={profileData.birthdate} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-gray-500 focus:border-gray-500 sm:text-sm" />
           </div>
           <div className="mb-4">
             <label htmlFor="profilePicture" className="block text-sm font-medium text-gray-700">Profile Picture</label>
-            <input type="file" id="profilePicture" name="profilePicture" accept="image/*" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-green-500 focus:border-green-500 sm:text-sm" />
+            <input type="file" id="profilePicture" name="profilePicture" accept="image/*" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-gray-500 focus:border-gray-500 sm:text-sm" />
           </div>
           {profilePictureUrl && (
             <div className="mb-4">
               <img src={profilePictureUrl} alt="Profile" className="w-32 h-32 rounded-full" />
             </div>
           )}
-          <button type="submit" disabled={saving} className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Save</button>
+          <button type="submit" disabled={saving} className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">Save</button>
         </form>
       </div>
     </div>

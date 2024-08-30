@@ -13,7 +13,7 @@ function Homes() {
   return (
     <div className="bg-gray-100 min-h-screen">
       {/* Navbar */}
-      <nav className="bg-green-600">
+      <nav className="bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -24,10 +24,10 @@ function Homes() {
             {/* Navbar links (Desktop) */}
             <div className="hidden sm:block">
               <div className="flex space-x-4">
-                <Link to={{ pathname: '/profiles', state: { username } }} className="text-white hover:bg-green-500 px-3 py-2 rounded-md text-sm font-medium">
+                <Link to={{ pathname: '/profiles', state: { username } }} className="text-white hover:bg-gray-500 px-3 py-2 rounded-md text-sm font-medium">
                   Profile
                 </Link>
-                <Link to={{ pathname: '/appointment', state: { username } }} className="text-white hover:bg-green-500 px-3 py-2 rounded-md text-sm font-medium">
+                <Link to={{ pathname: '/appointment', state: { username } }} className="text-white hover:bg-gray-500 px-3 py-2 rounded-md text-sm font-medium">
                   Appointment
                 </Link>
                 <span className="text-white px-3 py-2 rounded-md text-sm font-medium">
@@ -40,7 +40,7 @@ function Homes() {
             <div className="sm:hidden">
               <button
                 type="button"
-                className="text-white hover:bg-green-500 px-3 py-2 rounded-md text-sm font-medium"
+                className="text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium"
                 onClick={toggleMobileMenu}
               >
                 Menu
@@ -51,11 +51,11 @@ function Homes() {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="sm:hidden bg-green-600">
-            <Link to={{ pathname: '/profiles', state: { username } }} className="block text-white hover:bg-green-500 px-3 py-2 rounded-md text-sm font-medium">
+          <div className="sm:hidden bg-gray-700">
+            <Link to={{ pathname: '/profiles', state: { username } }} className="block text-white hover:bg-gray-500 px-3 py-2 rounded-md text-sm font-medium">
               Profile
             </Link>
-            <Link to={{ pathname: '/appointment', state: { username } }} className="block text-white hover:bg-green-500 px-3 py-2 rounded-md text-sm font-medium">
+            <Link to={{ pathname: '/appointment', state: { username } }} className="block text-white hover:bg-gray-500 px-3 py-2 rounded-md text-sm font-medium">
               Appointment
             </Link>
             <span className="block text-white px-3 py-2 rounded-md text-sm font-medium">
@@ -66,7 +66,7 @@ function Homes() {
       </nav>
 
       {/* Hero Section */}
-      <header className="bg-green-500 py-20 px-4 sm:px-6 lg:px-8 text-center">
+      <header className="bg-gray-600 py-20 px-4 sm:px-6 lg:px-8 text-center">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">Achieve Your Health Goals</h1>
           <p className="text-lg text-white">Stay motivated with our inspiring quotes and achieve a healthier lifestyle.</p>
@@ -92,7 +92,7 @@ function Homes() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-green-500 py-4 fixed bottom-0 w-full">
+      <footer className="bg-black py-4 fixed bottom-0 w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white text-center">
           &copy; {new Date().getFullYear()} Your Company. All rights reserved.
         </div>

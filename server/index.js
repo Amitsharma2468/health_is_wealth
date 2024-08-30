@@ -135,6 +135,26 @@ app.post("/sslcommerz/success/:tran_id", async (req, res) => {
     res.status(500).send('Error updating transaction status');
   }
 });
+// Endpoint to get transaction details
+app.get("/api/transaction/:tran_id", async (req, res) => {
+  const { tran_id } = req.params;
+
+  try {
+    // Query to get transaction details from the database
+    const query = `SELECT * FROM bills WHERE transaction_id = ?`;
+    const [rows] = await sslcommerzDb.execute(query, [tran_id]);
+
+    if (rows.length > 0) {
+      res.send(rows[0]);
+    } else {
+      res.status(404).send('Transaction not found');
+    }
+  } catch (error) {
+    console.error('Error fetching transaction details:', error);
+    res.status(500).send('Error fetching transaction details');
+  }
+});
+
 
 app.post("/sslcommerz/fail", (req, res) => {
   res.redirect("http://localhost:5173/fail");

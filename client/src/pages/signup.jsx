@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function Signup() {
   const [fullName, setFullName] = useState('');
@@ -7,6 +8,7 @@ function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const navigate = useNavigate(); // Initialize the useNavigate hook
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,6 +33,10 @@ function Signup() {
       console.error('There was an error!', error);
       setMessage('Signup failed. Please try again.');
     }
+  };
+
+  const handleLoginRedirect = () => {
+    navigate('/login'); // Redirect to the Login page
   };
 
   return (
@@ -92,13 +98,21 @@ function Signup() {
         <div className="mb-4">
           <button
             type="submit"
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="bg-gray-700 hover:bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           >
             Sign Up
           </button>
         </div>
       </form>
-      {message && <p className="text-red-500 text-xs italic">{message}</p>}
+      {message && <p className="text-green-500 text-xs italic">{message}</p>}
+      <div className="mt-4">
+        <button
+          onClick={handleLoginRedirect}
+          className="bg-gray-700 hover:bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        >
+          Log In
+        </button>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-
 function HomePage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -9,9 +8,9 @@ function HomePage() {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div className="bg-gray-100 min-h-screen flex flex-col">
       {/* Navbar */}
-      <nav className="bg-green-600">
+      <nav className="bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -22,10 +21,10 @@ function HomePage() {
             {/* Navbar links (Desktop) */}
             <div className="hidden sm:block">
               <div className="flex space-x-4">
-                <a href="/signup" className="text-white hover:bg-green-500 px-3 py-2 rounded-md text-sm font-medium">
+                <a href="/signup" className="text-white hover:bg-slate-500 px-3 py-2 rounded-md text-sm font-medium">
                   SignUp
                 </a>
-                <a href="/login" className="text-white hover:bg-green-500 px-3 py-2 rounded-md text-sm font-medium">
+                <a href="/login" className="text-white hover:bg-slate-500 px-3 py-2 rounded-md text-sm font-medium">
                   LogIn
                 </a>
               </div>
@@ -35,7 +34,7 @@ function HomePage() {
             <div className="sm:hidden">
               <button
                 type="button"
-                className="text-white hover:bg-green-500 px-3 py-2 rounded-md text-sm font-medium"
+                className="text-white hover:bg-slate-500 px-3 py-2 rounded-md text-sm font-medium"
                 onClick={toggleMobileMenu}
               >
                 Menu
@@ -43,14 +42,14 @@ function HomePage() {
             </div>
           </div>
         </div>
-        
+
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="sm:hidden bg-green-600">
-            <a href="/signup" className="block text-white hover:bg-green-500 px-3 py-2 rounded-md text-sm font-medium">
+          <div className="sm:hidden bg-black">
+            <a href="/signup" className="block text-white hover:bg-slate-500 px-3 py-2 rounded-md text-sm font-medium">
               SignUp
             </a>
-            <a href="/login" className="block text-white hover:bg-green-500 px-3 py-2 rounded-md text-sm font-medium">
+            <a href="/login" className="block text-white hover:bg-slate-500 px-3 py-2 rounded-md text-sm font-medium">
               LogIn
             </a>
           </div>
@@ -58,7 +57,7 @@ function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <header className="bg-green-500 py-20 px-4 sm:px-6 lg:px-8 text-center">
+      <header className="bg-slate-500 py-20 px-4 sm:px-6 lg:px-8 text-center flex-grow">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">Achieve Your Health Goals</h1>
           <p className="text-lg text-white">Stay motivated with our inspiring quotes and achieve a healthier lifestyle.</p>
@@ -66,7 +65,7 @@ function HomePage() {
       </header>
 
       {/* Motivational Quotes */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8">
+      <section className="py-12 px-4 sm:px-6 lg:px-8 flex-grow">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-semibold text-gray-800 mb-6">Health Motivational Quotes</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -84,7 +83,7 @@ function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-green-500 py-4">
+      <footer className="bg-black py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white text-center">
           &copy; {new Date().getFullYear()} Your Company. All rights reserved.
         </div>
@@ -94,4 +93,3 @@ function HomePage() {
 }
 
 export default HomePage;
-
