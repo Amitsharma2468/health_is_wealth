@@ -14,6 +14,8 @@ function Prescription() {
   });
   const [prescriptionPictureUrl, setPrescriptionPictureUrl] = useState('');
   const [prescriptions, setPrescriptions] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState('');
 
   const fetchPrescriptions = async () => {
     try {
@@ -102,6 +104,16 @@ function Prescription() {
     }
   };
 
+  const handleImageClick = (imageUrl) => {
+    setSelectedImage(imageUrl);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedImage('');
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
       <Navbar username={username} />
@@ -157,7 +169,7 @@ function Prescription() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {prescriptions.length > 0 ? (
               prescriptions.map((prescription, index) => (
-                <div key={index} className="bg-white p-4 rounded-lg shadow-lg">
+                <div key={index} className="bg-white p-4 rounded-lg shadow-lg cursor-pointer" onClick={() => handleImageClick(prescription.prescriptionPicture)}>
                   <img
                     src={prescription.prescriptionPicture}
                     alt={prescription.caption}
@@ -171,10 +183,20 @@ function Prescription() {
             )}
           </div>
         </div>
+
+        {showModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-4 rounded-lg relative">
+              <button className="absolute top-2 right-2 text-gray-700 hover:text-gray-900" onClick={closeModal}>
+                &times;
+              </button>
+              <img src={selectedImage} alt="Full Prescription" className="max-w-full max-h-screen rounded-md" />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
 export default Prescription;
-
