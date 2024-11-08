@@ -30,6 +30,9 @@ function Homes() {
                 <Link to={{ pathname: '/appointment', state: { username } }} className="text-white hover:bg-gray-500 px-3 py-2 rounded-md text-sm font-medium">
                   Appointment
                 </Link>
+                <Link to={{ pathname: '/prescription', state: { username } }} className="text-white hover:bg-gray-500 px-3 py-2 rounded-md text-sm font-medium">
+                  Prescription
+                </Link>
                 <span className="text-white px-3 py-2 rounded-md text-sm font-medium">
                   {username}
                 </span>
@@ -57,6 +60,9 @@ function Homes() {
             </Link>
             <Link to={{ pathname: '/appointment', state: { username } }} className="block text-white hover:bg-gray-500 px-3 py-2 rounded-md text-sm font-medium">
               Appointment
+            </Link>
+            <Link to={{ pathname: '/prescription', state: { username } }} className="block text-white hover:bg-gray-500 px-3 py-2 rounded-md text-sm font-medium">
+              Prescription
             </Link>
             <span className="block text-white px-3 py-2 rounded-md text-sm font-medium">
               {username}

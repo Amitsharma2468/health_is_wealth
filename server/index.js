@@ -284,6 +284,61 @@ app.get('/api/medicines', (req, res) => {
   });
 });
 
+// Prescription Upload Route
+app.post('/api/prescription/upload/:username', async (req, res) => {
+  const { username } = req.params;
+  const { caption, prescriptionPictureUrl } = req.body;
+  console.log('Received prescription data:', { caption, prescriptionPictureUrl });
+
+  db.query('SELECT id FROM signupdb WHERE username = ?', [username], (err, results) => {
+    if (err) {
+      console.error('Error querying user:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const userId = results[0].id;
+
+    // Insert the prescription into the database
+    db.query(
+      'INSERT INTO prescriptions (user_id, prescriptionPicture, caption) VALUES (?, ?, ?)',
+      [userId, prescriptionPictureUrl, caption],
+      (err, results) => {
+        if (err) {
+          console.error('Error inserting prescription:', err);
+          return res.status(500).json({ error: 'Failed to upload prescription' });
+        }
+        console.log('Prescription uploaded successfully');
+        res.status(200).json({ message: 'Prescription uploaded successfully' });
+      }
+    );
+  });
+});
+
+// Fetch prescriptions for a specific user
+app.get('/api/prescriptions/:username', (req, res) => {
+  const { username } = req.params;
+
+  const sqlFetch = `
+    SELECT p.prescriptionPicture, p.caption
+    FROM prescriptions AS p
+    JOIN signupdb AS u ON p.user_id = u.id
+    WHERE u.username = ?`;
+
+  db.query(sqlFetch, [username], (err, results) => {
+    if (err) {
+      console.error('Error executing MySQL query:', err);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+    res.status(200).json({ prescriptions: results });
+  });
+});
+
+// Serve images statically from the 'uploads' folder
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Start server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

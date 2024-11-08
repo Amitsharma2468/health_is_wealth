@@ -8,6 +8,8 @@ import Profiles from './pages/Profiles';
 import Appointment from './pages/Appointment';
 import Payment from './pages/Payment';
 import Success from './pages/Success';
+import Prescription from './pages/Prescription';
+
 
 
 function App() {
@@ -21,7 +23,8 @@ function App() {
         <Route path="/profiles" element={<Profiles />} />
         <Route path="/appointment" element={<Appointment />} />
         <Route path="/payment" element={<Payment />} /> 
-        <Route path="/success" element={<Success />} /> 
+        <Route path="/success" element={<Success />} />
+        <Route path="/prescription" element={<Prescription />} /> 
        
        
         
