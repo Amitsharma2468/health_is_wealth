@@ -72,7 +72,7 @@ const Payment = () => {
         />
         <button
           onClick={handlePayment}
-          className="bg-blue-500 text-white py-2 px-4 rounded"
+          className="bg-black text-white py-2 px-4 rounded w-full hover:bg-gray-600 transition-colors duration-200"
         >
           Pay Now
         </button>
