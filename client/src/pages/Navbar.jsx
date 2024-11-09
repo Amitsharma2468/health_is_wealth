@@ -32,6 +32,10 @@ const Navbar = ({ username }) => {
               <span className="text-white px-3 py-2 rounded-md text-sm font-medium">
                 {username}
               </span>
+              {/* Log Out Button */}
+              <Link to="/" className="text-white hover:bg-gray-500 px-3 py-2 rounded-md text-sm font-medium">
+                Log Out
+              </Link>
             </div>
           </div>
 
@@ -63,6 +67,10 @@ const Navbar = ({ username }) => {
           <span className="block text-white px-3 py-2 rounded-md text-sm font-medium">
             {username}
           </span>
+          {/* Log Out Button (Mobile) */}
+          <Link to="/" className="block text-white hover:bg-gray-500 px-3 py-2 rounded-md text-sm font-medium">
+            Log Out
+          </Link>
         </div>
       )}
     </nav>
@@ -70,3 +78,4 @@ const Navbar = ({ username }) => {
 };
 
 export default Navbar;
+

@@ -63,7 +63,7 @@ const Success = () => {
         <p className="text-sm text-gray-500">Amount: {transactionData.amount} {transactionData.currency}</p>
         <button
           onClick={() => window.print()}
-          className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
+          className="bg-black text-white py-2 px-4 rounded"
         >
           Print Ticket
         </button>
