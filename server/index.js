@@ -159,8 +159,16 @@ app.get("/api/transaction/:tran_id", async (req, res) => {
 app.post("/sslcommerz/fail", (req, res) => {
   res.redirect("http://localhost:5173/fail");
 });
+function logActivity(userId, activityType, description) {
+  const sqlLog = `INSERT INTO activity_log (user_id, activity_type, description) VALUES (?, ?, ?)`;
+  db.query(sqlLog, [userId, activityType, description], (err) => {
+    if (err) {
+      console.error('Error logging activity:', err.sqlMessage);
+    }
+  });
+}
 
-// Other Routes
+
 // Signup endpoint
 app.post('/api/signup', async (req, res) => {
   const { fullName, username, email, password } = req.body;
@@ -176,6 +184,7 @@ app.post('/api/signup', async (req, res) => {
       }
 
       console.log('New user signed up:', result);
+      logActivity(result.insertId, 'SIGNUP', 'You signed up');
       return res.status(201).json({ message: 'Signup successful' });
     });
   } catch (err) {
@@ -207,21 +216,17 @@ app.post('/api/login', (req, res) => {
     }
 
     console.log('User logged in:', user);
+    logActivity(user.id, 'LOGIN', 'You logged in');
     return res.status(200).json({ message: 'Login successful', username: user.username });
   });
 });
 
-// Update profile endpoint
+// Profile update endpoint
 app.post('/api/profile/:username', upload.single('profilePicture'), (req, res) => {
   const { habits, age, bloodGroup, birthdate, profilePictureUrl } = req.body;
   const { username } = req.params;
 
-  const sqlUpdate = 
-    `UPDATE signupdb 
-    SET habits = ?, age = ?, bloodGroup = ?, birthdate = STR_TO_DATE(?, '%Y-%m-%d'), profilePicture = ?
-    WHERE username = ?`
-  ;
-
+  const sqlUpdate = `UPDATE signupdb SET habits = ?, age = ?, bloodGroup = ?, birthdate = STR_TO_DATE(?, '%Y-%m-%d'), profilePicture = ? WHERE username = ?`;
   db.query(sqlUpdate, [habits, age, bloodGroup, birthdate, profilePictureUrl, username], (err, result) => {
     if (err) {
       console.error('Error executing MySQL query:', err.sqlMessage);
@@ -229,7 +234,36 @@ app.post('/api/profile/:username', upload.single('profilePicture'), (req, res) =
     }
 
     console.log('Profile information updated for user:', username);
+    // Fetch the user ID
+    const userIdQuery = 'SELECT id FROM signupdb WHERE username = ?';
+    db.query(userIdQuery, [username], (err, results) => {
+      if (err || results.length === 0) return;
+      const userId = results[0].id;
+      logActivity(userId, 'UPDATE', 'You updated profile');
+    });
+
     return res.status(200).json({ message: 'Profile information updated successfully' });
+  });
+});
+app.get('/api/activity-log/:username', (req, res) => {
+  const { username } = req.params;
+  
+  const sqlFetchUserId = 'SELECT id FROM signupdb WHERE username = ?';
+  db.query(sqlFetchUserId, [username], (err, userResults) => {
+    if (err || userResults.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const userId = userResults[0].id;
+    const sqlFetchLogs = 'SELECT * FROM activity_log WHERE user_id = ? ORDER BY timestamp DESC';
+    db.query(sqlFetchLogs, [userId], (err, logResults) => {
+      if (err) {
+        console.error('Error executing MySQL query:', err.sqlMessage);
+        return res.status(500).json({ error: 'Internal server error' });
+      }
+
+      return res.status(200).json({ activities: logResults });
+    });
   });
 });
 
@@ -255,6 +289,7 @@ app.get('/api/profile/:username', (req, res) => {
     return res.status(200).json({ profile });
   });
 });
+
 
 // Fetch doctor list endpoint
 app.get('/api/doctors', (req, res) => {

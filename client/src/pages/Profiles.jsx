@@ -17,9 +17,11 @@ function Profiles() {
     profilePicture: null
   });
   const [profilePictureUrl, setProfilePictureUrl] = useState('');
+  const [activityLog, setActivityLog] = useState([]); // State for Activity Log
 
   useEffect(() => {
     fetchProfileData(username);
+    fetchActivityLog(username); // Fetch activity log on component load
   }, [username]);
 
   const fetchProfileData = async (username) => {
@@ -35,6 +37,19 @@ function Profiles() {
       }
     } catch (error) {
       console.error('Error fetching profile data:', error.message);
+    }
+  };
+
+  const fetchActivityLog = async (username) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/activity-log/${username}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch activity log');
+      }
+      const data = await response.json();
+      setActivityLog(data.activities); // Set the activity log data
+    } catch (error) {
+      console.error('Error fetching activity log:', error.message);
     }
   };
 
@@ -69,7 +84,6 @@ function Profiles() {
     if (profileData.profilePicture) {
       try {
         profilePictureUrl = await uploadImageToCloudinary(profileData.profilePicture);
-        window.alert(profilePictureUrl);
       } catch (error) {
         console.error('Error uploading image:', error);
         return; // Exit the function if the image upload fails
@@ -151,6 +165,24 @@ function Profiles() {
           )}
           <button type="submit" disabled={saving} className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">Save</button>
         </form>
+        
+        {/* Activity Log Section */}
+        <div className="mt-8">
+          <h3 className="text-2xl font-bold text-gray-800">Activity Log</h3>
+          {activityLog.length === 0 ? (
+            <p className="text-gray-500">No recent activities.</p>
+          ) : (
+            <ul className="mt-4 space-y-2">
+              {activityLog.map((activity, index) => (
+                <li key={index} className="bg-white shadow rounded-md p-4">
+                  <p className="text-sm text-gray-600">{new Date(activity.timestamp).toLocaleString()}</p>
+                  <p className="font-medium text-gray-900">{activity.activity_type}</p>
+                  <p className="text-gray-700">{activity.description}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </div>
   );
